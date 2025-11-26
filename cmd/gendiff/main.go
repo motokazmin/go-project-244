@@ -1,6 +1,7 @@
 package main
 
 import (
+	"code"
 	"context"
 	"fmt"
 	"log"
@@ -40,6 +41,19 @@ func main() {
 			if err != nil {
 				return fmt.Errorf("invalid path2: %w", err)
 			}
+
+			data1, err := code.ParseFile(path1)
+			if err != nil {
+				return fmt.Errorf("failed to parse %s: %w", path1, err)
+			}
+
+			data2, err := code.ParseFile(path2)
+			if err != nil {
+				return fmt.Errorf("failed to parse %s: %w", path2, err)
+			}
+
+			diff := code.GenDiff(data1, data2)
+			fmt.Println(diff)
 
 			fmt.Printf("Comparing files:\n  Path1: %s\n  Path2: %s\n", path1, path2)
 
