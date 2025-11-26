@@ -2,8 +2,10 @@ package main
 
 import (
 	"context"
+	"fmt"
 	"log"
 	"os"
+	"path/filepath"
 
 	cli "github.com/urfave/cli/v3"
 )
@@ -24,9 +26,22 @@ func main() {
 		Action: func(ctx context.Context, cmd *cli.Command) error {
 			args := cmd.Args().Slice()
 
-			if len(args) == 0 {
+			if len(args) < 2 {
+				fmt.Println("Error: two file paths are required")
 				return cli.ShowAppHelp(cmd)
 			}
+
+			path1, err := filepath.Abs(args[0])
+			if err != nil {
+				return fmt.Errorf("invalid path1: %w", err)
+			}
+
+			path2, err := filepath.Abs(args[1])
+			if err != nil {
+				return fmt.Errorf("invalid path2: %w", err)
+			}
+
+			fmt.Printf("Comparing files:\n  Path1: %s\n  Path2: %s\n", path1, path2)
 
 			return nil
 		},
