@@ -32,6 +32,8 @@ func main() {
 				return cli.ShowAppHelp(cmd)
 			}
 
+			format := cmd.String("format")
+
 			path1, err := filepath.Abs(args[0])
 			if err != nil {
 				return fmt.Errorf("invalid path1: %w", err)
@@ -52,7 +54,7 @@ func main() {
 				return fmt.Errorf("failed to parse %s: %w", path2, err)
 			}
 
-			diff := code.GenDiff(data1, data2)
+			diff := code.GenDiff(data1, data2, format)
 			fmt.Println(diff)
 
 			fmt.Printf("Comparing files:\n  Path1: %s\n  Path2: %s\n", path1, path2)

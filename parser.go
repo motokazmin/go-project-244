@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
-	"sort"
 	"strings"
 
 	"gopkg.in/yaml.v3"
@@ -49,43 +48,8 @@ func parseYAML(data []byte) (map[string]interface{}, error) {
 	return result, nil
 }
 
-// GenDiff генерирует строку с различиями между двумя map
-func GenDiff(data1, data2 map[string]interface{}) string {
-	keys := make(map[string]bool)
-	for k := range data1 {
-		keys[k] = true
-	}
-	for k := range data2 {
-		keys[k] = true
-	}
-
-	sortedKeys := make([]string, 0, len(keys))
-	for k := range keys {
-		sortedKeys = append(sortedKeys, k)
-	}
-	sort.Strings(sortedKeys)
-
-	var result strings.Builder
-	result.WriteString("{\n")
-
-	for _, key := range sortedKeys {
-		val1, exists1 := data1[key]
-		val2, exists2 := data2[key]
-
-		if exists1 && exists2 {
-			if fmt.Sprint(val1) == fmt.Sprint(val2) {
-				result.WriteString(fmt.Sprintf("    %s: %v\n", key, val1))
-			} else {
-				result.WriteString(fmt.Sprintf("  - %s: %v\n", key, val1))
-				result.WriteString(fmt.Sprintf("  + %s: %v\n", key, val2))
-			}
-		} else if exists1 {
-			result.WriteString(fmt.Sprintf("  - %s: %v\n", key, val1))
-		} else {
-			result.WriteString(fmt.Sprintf("  + %s: %v\n", key, val2))
-		}
-	}
-
-	result.WriteString("}")
-	return result.String()
+// GenDiff — главная функция, которая собирает все части
+func GenDiff(data1, data2 map[string]interface{}, unused string) string {
+	diffTree := BuildDiff(data1, data2)
+	return StylishFormatter(diffTree)
 }
