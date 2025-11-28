@@ -79,20 +79,7 @@ func TestGenDiffEqualFiles(t *testing.T) {
 }
 
 func TestGenDiffIntegration(t *testing.T) {
-	// Используем файлы из testdata
-	file1Path := filepath.Join("testdata", "file1.json")
-	file2Path := filepath.Join("testdata", "file2.json")
-
-	// Парсим файлы
-	data1, err := ParseFile(file1Path)
-	require.NoError(t, err)
-
-	data2, err := ParseFile(file2Path)
-	require.NoError(t, err)
-
-	// Генерируем diff
-	result := GenDiff(data1, data2)
-
+	// Ожидаемый результат общий для всех кейсов, выносим его наверх
 	expected := `{
   - follow: false
     host: hexlet.io
@@ -102,48 +89,44 @@ func TestGenDiffIntegration(t *testing.T) {
   + verbose: true
 }`
 
-	assert.Equal(t, expected, result)
+	// Определяем тестовые случаи (Table-Driven Tests)
+	tests := []struct {
+		name      string
+		file1Name string
+		file2Name string
+	}{
+		{
+			name:      "JSON files",
+			file1Name: "file1.json",
+			file2Name: "file2.json",
+		},
+		{
+			name:      "YAML files",
+			file1Name: "file1.yaml",
+			file2Name: "file2.yaml",
+		},
+	}
 
-	// Проверяем что результат не пустой
-	assert.NotEmpty(t, result)
+	for _, tt := range tests {
+		// t.Run запускает подтест для каждого случая
+		t.Run(tt.name, func(t *testing.T) {
+			file1Path := filepath.Join("testdata", tt.file1Name)
+			file2Path := filepath.Join("testdata", tt.file2Name)
 
-	// Проверяем что содержит ключевые элементы
-	assert.Contains(t, result, "host: hexlet.io")
-	assert.Contains(t, result, "- follow: false")
-	assert.Contains(t, result, "+ verbose: true")
-}
+			data1, err := ParseFile(file1Path)
+			require.NoError(t, err)
 
-func TestGenDiffIntegrationYaml(t *testing.T) {
-	// Используем файлы из testdata
-	file1Path := filepath.Join("testdata", "file1.yaml")
-	file2Path := filepath.Join("testdata", "file2.yaml")
+			data2, err := ParseFile(file2Path)
+			require.NoError(t, err)
 
-	// Парсим файлы
-	data1, err := ParseFile(file1Path)
-	require.NoError(t, err)
+			result := GenDiff(data1, data2)
 
-	data2, err := ParseFile(file2Path)
-	require.NoError(t, err)
-
-	// Генерируем diff
-	result := GenDiff(data1, data2)
-
-	expected := `{
-  - follow: false
-    host: hexlet.io
-  - proxy: 123.234.53.22
-  - timeout: 50
-  + timeout: 20
-  + verbose: true
-}`
-
-	assert.Equal(t, expected, result)
-
-	// Проверяем что результат не пустой
-	assert.NotEmpty(t, result)
-
-	// Проверяем что содержит ключевые элементы
-	assert.Contains(t, result, "host: hexlet.io")
-	assert.Contains(t, result, "- follow: false")
-	assert.Contains(t, result, "+ verbose: true")
+			// Все проверки теперь находятся в одном месте
+			assert.Equal(t, expected, result)
+			assert.NotEmpty(t, result)
+			assert.Contains(t, result, "host: hexlet.io")
+			assert.Contains(t, result, "- follow: false")
+			assert.Contains(t, result, "+ verbose: true")
+		})
+	}
 }
