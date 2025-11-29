@@ -1,12 +1,13 @@
-package code
+package formatters
 
 import (
+	"code/models"
 	"fmt"
 	"strings"
 )
 
 // StylishFormatter форматирует дерево различий в стиле Stylish.
-func StylishFormatter(diff MapDiff) string {
+func StylishFormatter(diff models.MapDiff) string {
 	var builder strings.Builder
 	builder.WriteString("{\n")
 	formatNodes(diff, &builder, 1) // Начинаем с отступа 1 (4 пробела)
@@ -16,7 +17,7 @@ func StylishFormatter(diff MapDiff) string {
 
 // formatNodes рекурсивно обходит узлы и записывает отформатированную строку.
 // indentLevel - уровень вложенности для отступов (1 уровень = 4 пробела)
-func formatNodes(diff MapDiff, builder *strings.Builder, indentLevel int) {
+func formatNodes(diff models.MapDiff, builder *strings.Builder, indentLevel int) {
 	const indentSize = 4
 
 	// Базовый отступ: (4 * уровень) - 2 пробела (для символов "+", "-", " ")
@@ -24,20 +25,20 @@ func formatNodes(diff MapDiff, builder *strings.Builder, indentLevel int) {
 
 	for _, node := range diff {
 		switch node.Type {
-		case Unchanged:
+		case models.Unchanged:
 			// Отступ + "  " + ключ: значение
 			builder.WriteString(fmt.Sprintf("%s  %s: %v\n", baseIndent, node.Key, formatValue(node.Value1, indentLevel)))
-		case Added:
+		case models.Added:
 			// Отступ + "+ " + ключ: значение
 			builder.WriteString(fmt.Sprintf("%s+ %s: %v\n", baseIndent, node.Key, formatValue(node.Value2, indentLevel)))
-		case Removed:
+		case models.Removed:
 			// Отступ + "- " + ключ: значение
 			builder.WriteString(fmt.Sprintf("%s- %s: %v\n", baseIndent, node.Key, formatValue(node.Value1, indentLevel)))
-		case Changed:
+		case models.Changed:
 			// Сначала Removed, потом Added
 			builder.WriteString(fmt.Sprintf("%s- %s: %v\n", baseIndent, node.Key, formatValue(node.Value1, indentLevel)))
 			builder.WriteString(fmt.Sprintf("%s+ %s: %v\n", baseIndent, node.Key, formatValue(node.Value2, indentLevel)))
-		case Nested:
+		case models.Nested:
 			// Вложенная структура: открываем новую секцию
 			builder.WriteString(fmt.Sprintf("%s  %s: {\n", baseIndent, node.Key))
 			// Рекурсивный вызов для дочерних узлов
@@ -51,12 +52,11 @@ func formatNodes(diff MapDiff, builder *strings.Builder, indentLevel int) {
 // formatValue форматирует значение. Если значение - карта (объект),
 // он рекурсивно выводит его содержимое в стиле Stylish.
 func formatValue(v interface{}, indentLevel int) string {
-	// FIX: Преобразуем nil в строку "null"
 	if v == nil {
 		return "null"
 	}
 
-	if m, isMap := isMap(v); isMap {
+	if m, isMap := models.IsMap(v); isMap {
 		var innerBuilder strings.Builder
 		innerBuilder.WriteString("{\n")
 
@@ -64,7 +64,7 @@ func formatValue(v interface{}, indentLevel int) string {
 		nextBaseIndent := strings.Repeat(" ", (indentLevel+1)*4-2)
 
 		// Получаем и сортируем ключи для детерминированного вывода
-		keys := findUniqueSortedKeys(m, nil)
+		keys := models.FindUniqueSortedKeys(m, nil)
 
 		for _, key := range keys {
 			// Рекурсивно форматируем вложенные значения (с увеличенным уровнем отступа)

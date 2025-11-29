@@ -38,7 +38,7 @@ func TestGenDiff(t *testing.T) {
 			data2, err := ParseFile(tt.file2Path)
 			require.NoError(t, err)
 
-			result := GenDiff(data1, data2, "stylish")
+			result, _ := GenDiff(data1, data2, "stylish")
 			assert.Equal(t, tt.expected, result)
 		})
 	}
@@ -72,12 +72,13 @@ func TestGenDiffEqualFiles(t *testing.T) {
 			data2, err := ParseFile(tt.file2Path)
 			require.NoError(t, err)
 
-			result := GenDiff(data1, data2, "stylish")
+			result, _ := GenDiff(data1, data2, "stylish")
 			assert.Equal(t, tt.expected, result)
 		})
 	}
 }
 
+// Интеграционные тесты
 func TestGenDiffIntegration(t *testing.T) {
 	expected := `{
   - follow: false
@@ -118,7 +119,7 @@ func TestGenDiffIntegration(t *testing.T) {
 			data2, err := ParseFile(file2Path)
 			require.NoError(t, err)
 
-			result := GenDiff(data1, data2, "stylish")
+			result, _ := GenDiff(data1, data2, "stylish")
 
 			assert.Equal(t, expected, result)
 			assert.NotEmpty(t, result)
@@ -187,7 +188,7 @@ func TestGenDiffIntegrationComplex(t *testing.T) {
 	require.NoError(t, err, "Ошибка при парсинге %s. Убедитесь, что файлы существуют.", file2Path)
 
 	// 3. Генерация diff
-	result := GenDiff(data1, data2, "stylish")
+	result, _ := GenDiff(data1, data2, "stylish")
 
 	// 4. Проверка
 	assert.Equal(t, expected, result, "Сгенерированный Diff не соответствует ожидаемому.")
@@ -204,7 +205,7 @@ func TestGenDiffIntegrationComplex(t *testing.T) {
 	require.NoError(t, err, "Ошибка при парсинге %s. Убедитесь, что файлы существуют.", file2Path)
 
 	// 3. Генерация diff
-	result = GenDiff(data1, data2, "stylish")
+	result, _ = GenDiff(data1, data2, "stylish")
 
 	// 4. Проверка
 	assert.Equal(t, expected, result, "Сгенерированный Diff не соответствует ожидаемому.")

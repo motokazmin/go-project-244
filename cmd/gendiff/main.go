@@ -54,7 +54,11 @@ func main() {
 				return fmt.Errorf("failed to parse %s: %w", path2, err)
 			}
 
-			diff := code.GenDiff(data1, data2, format)
+			diff, err := code.GenDiff(data1, data2, format)
+			if err != nil {
+				return err
+			}
+
 			fmt.Println(diff)
 
 			fmt.Printf("Comparing files:\n  Path1: %s\n  Path2: %s\n", path1, path2)

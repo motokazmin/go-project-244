@@ -7,6 +7,8 @@ import (
 	"path/filepath"
 	"strings"
 
+	f "code/formatters"
+
 	"gopkg.in/yaml.v3"
 )
 
@@ -49,7 +51,15 @@ func parseYAML(data []byte) (map[string]interface{}, error) {
 }
 
 // GenDiff — главная функция, которая собирает все части
-func GenDiff(data1, data2 map[string]interface{}, unused string) string {
+func GenDiff(data1, data2 map[string]interface{}, formater string) (string, error) {
 	diffTree := BuildDiff(data1, data2)
-	return StylishFormatter(diffTree)
+
+	if formater == "stylish" {
+		return f.StylishFormatter(diffTree), nil
+	}
+	if formater == "plain" {
+		return f.PlainFormatter(diffTree), nil
+	}
+
+	return "", fmt.Errorf("unsupported formater %s", formater)
 }
