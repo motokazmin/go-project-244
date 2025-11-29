@@ -60,6 +60,9 @@ func GenDiff(data1, data2 map[string]interface{}, formater string) (string, erro
 	if formater == "plain" {
 		return f.PlainFormatter(diffTree), nil
 	}
+	if formater == "json" {
+		return f.JSONFormatter(diffTree), nil
+	}
 
 	return "", fmt.Errorf("unsupported formater %s", formater)
 }
