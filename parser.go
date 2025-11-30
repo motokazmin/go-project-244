@@ -36,6 +36,15 @@ func parseFile(path string) (map[string]interface{}, error) {
 func parseJSON(data []byte) (map[string]interface{}, error) {
 	var result map[string]interface{}
 	if err := json.Unmarshal(data, &result); err != nil {
+		// Если это не объект, пробуем распарсить как массив
+		var arrayResult []interface{}
+		if arrayErr := json.Unmarshal(data, &arrayResult); arrayErr == nil {
+			// Успешно распарсили массив, оборачиваем его в map
+			return map[string]interface{}{
+				"_array": arrayResult,
+			}, nil
+		}
+		// Если оба варианта не сработали, возвращаем оригинальную ошибку
 		return nil, fmt.Errorf("invalid JSON: %w", err)
 	}
 	return result, nil
@@ -45,6 +54,15 @@ func parseJSON(data []byte) (map[string]interface{}, error) {
 func parseYAML(data []byte) (map[string]interface{}, error) {
 	var result map[string]interface{}
 	if err := yaml.Unmarshal(data, &result); err != nil {
+		// Если это не объект, пробуем распарсить как массив
+		var arrayResult []interface{}
+		if arrayErr := yaml.Unmarshal(data, &arrayResult); arrayErr == nil {
+			// Успешно распарсили массив, оборачиваем его в map
+			return map[string]interface{}{
+				"_array": arrayResult,
+			}, nil
+		}
+		// Если оба варианта не сработали, возвращаем оригинальную ошибку
 		return nil, fmt.Errorf("invalid YAML: %w", err)
 	}
 	return result, nil
