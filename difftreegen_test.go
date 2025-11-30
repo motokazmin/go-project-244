@@ -5,7 +5,6 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/assert"
-	"github.com/stretchr/testify/require"
 )
 
 func TestGenDiff(t *testing.T) {
@@ -32,13 +31,7 @@ func TestGenDiff(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			data1, err := ParseFile(tt.file1Path)
-			require.NoError(t, err)
-
-			data2, err := ParseFile(tt.file2Path)
-			require.NoError(t, err)
-
-			result, _ := GenDiff(data1, data2, "stylish")
+			result, _ := GenDiff(tt.file1Path, tt.file2Path, "stylish")
 			assert.Equal(t, tt.expected, result)
 		})
 	}
@@ -66,13 +59,7 @@ func TestGenDiffEqualFiles(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			data1, err := ParseFile(tt.file1Path)
-			require.NoError(t, err)
-
-			data2, err := ParseFile(tt.file2Path)
-			require.NoError(t, err)
-
-			result, _ := GenDiff(data1, data2, "stylish")
+			result, _ := GenDiff(tt.file1Path, tt.file2Path, "stylish")
 			assert.Equal(t, tt.expected, result)
 		})
 	}
@@ -113,13 +100,7 @@ func TestGenDiffIntegration(t *testing.T) {
 			file1Path := filepath.Join("testdata", tt.file1Name)
 			file2Path := filepath.Join("testdata", tt.file2Name)
 
-			data1, err := ParseFile(file1Path)
-			require.NoError(t, err)
-
-			data2, err := ParseFile(file2Path)
-			require.NoError(t, err)
-
-			result, _ := GenDiff(data1, data2, "stylish")
+			result, _ := GenDiff(file1Path, file2Path, "stylish")
 
 			assert.Equal(t, expected, result)
 			assert.NotEmpty(t, result)
@@ -176,37 +157,23 @@ func TestGenDiffIntegrationComplex(t *testing.T) {
     }
 }`
 
-	// 1. Пути к JSON файлам
+	// Пути к JSON файлам
 	file1Path := filepath.Join("testdata", "fixture", "file1.json")
 	file2Path := filepath.Join("testdata", "fixture", "file2.json")
 
-	// 2. Парсинг файлов
-	data1, err := ParseFile(file1Path)
-	require.NoError(t, err, "Ошибка при парсинге %s. Убедитесь, что файлы существуют.", file1Path)
+	// Генерация diff
+	result, _ := GenDiff(file1Path, file2Path, "stylish")
 
-	data2, err := ParseFile(file2Path)
-	require.NoError(t, err, "Ошибка при парсинге %s. Убедитесь, что файлы существуют.", file2Path)
-
-	// 3. Генерация diff
-	result, _ := GenDiff(data1, data2, "stylish")
-
-	// 4. Проверка
+	// Проверка
 	assert.Equal(t, expected, result, "Сгенерированный Diff не соответствует ожидаемому.")
 
-	// 1. Пути к YAML файлам
+	// Пути к YAML файлам
 	file1Path = filepath.Join("testdata", "fixture", "file1.yaml")
 	file2Path = filepath.Join("testdata", "fixture", "file2.yaml")
 
-	// 2. Парсинг файлов
-	data1, err = ParseFile(file1Path)
-	require.NoError(t, err, "Ошибка при парсинге %s. Убедитесь, что файлы существуют.", file1Path)
+	// Генерация diff
+	result, _ = GenDiff(file1Path, file2Path, "stylish")
 
-	data2, err = ParseFile(file2Path)
-	require.NoError(t, err, "Ошибка при парсинге %s. Убедитесь, что файлы существуют.", file2Path)
-
-	// 3. Генерация diff
-	result, _ = GenDiff(data1, data2, "stylish")
-
-	// 4. Проверка
+	// Проверка
 	assert.Equal(t, expected, result, "Сгенерированный Diff не соответствует ожидаемому.")
 }

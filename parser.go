@@ -12,9 +12,9 @@ import (
 	"gopkg.in/yaml.v3"
 )
 
-// ParseFile читает и парсит файл в map[string]interface{}
+// parseFile читает и парсит файл в map[string]interface{}
 // Формат определяется по расширению файла
-func ParseFile(path string) (map[string]interface{}, error) {
+func parseFile(path string) (map[string]interface{}, error) {
 	data, err := os.ReadFile(path)
 	if err != nil {
 		return nil, fmt.Errorf("cannot read file: %w", err)
@@ -51,7 +51,17 @@ func parseYAML(data []byte) (map[string]interface{}, error) {
 }
 
 // GenDiff — главная функция, которая собирает все части
-func GenDiff(data1, data2 map[string]interface{}, formater string) (string, error) {
+func GenDiff(path1, path2, formater string) (string, error) {
+	data1, err := parseFile(path1)
+	if err != nil {
+		return "", err
+	}
+
+	data2, err := parseFile(path2)
+	if err != nil {
+		return "", err
+	}
+
 	diffTree := BuildDiff(data1, data2)
 
 	if formater == "stylish" {

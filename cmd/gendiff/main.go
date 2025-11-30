@@ -44,17 +44,7 @@ func main() {
 				return fmt.Errorf("invalid path2: %w", err)
 			}
 
-			data1, err := code.ParseFile(path1)
-			if err != nil {
-				return fmt.Errorf("failed to parse %s: %w", path1, err)
-			}
-
-			data2, err := code.ParseFile(path2)
-			if err != nil {
-				return fmt.Errorf("failed to parse %s: %w", path2, err)
-			}
-
-			diff, err := code.GenDiff(data1, data2, format)
+			diff, err := code.GenDiff(path1, path2, format)
 			if err != nil {
 				return err
 			}
