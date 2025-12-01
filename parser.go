@@ -7,8 +7,6 @@ import (
 	"path/filepath"
 	"strings"
 
-	f "code/formatters"
-
 	"gopkg.in/yaml.v3"
 )
 
@@ -65,7 +63,7 @@ func parseYAML(data []byte) (map[string]interface{}, error) {
 }
 
 // GenDiff — главная функция, которая собирает все части
-func GenDiff(path1, path2, formater string) (string, error) {
+func GenDiff(path1, path2, formatter string) (string, error) {
 	data1, err := parseFile(path1)
 	if err != nil {
 		return "", err
@@ -76,17 +74,16 @@ func GenDiff(path1, path2, formater string) (string, error) {
 		return "", err
 	}
 
-	diffTree := BuildDiff(data1, data2)
+	diffTree := buildDiff(data1, data2)
 
-	if formater == "stylish" {
-		return f.StylishFormatter(diffTree), nil
+	switch formatter {
+	case "stylish":
+		return formatStylish(diffTree), nil
+	case "plain":
+		return formatPlain(diffTree), nil
+	case "json":
+		return formatJSON(diffTree), nil
+	default:
+		return "", fmt.Errorf("unsupported formatter %s", formatter)
 	}
-	if formater == "plain" {
-		return f.PlainFormatter(diffTree), nil
-	}
-	if formater == "json" {
-		return f.JSONFormatter(diffTree), nil
-	}
-
-	return "", fmt.Errorf("unsupported formater %s", formater)
 }
