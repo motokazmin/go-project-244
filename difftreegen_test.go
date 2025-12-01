@@ -12,6 +12,7 @@ const JSON1 = "file1.json"
 const JSON2 = "file2.json"
 const YAML1 = "file1.yaml"
 const YAML2 = "file2.yaml"
+const ERRMSG = "GenDiff должна была успешно выполниться"
 
 func TestGenDiff(t *testing.T) {
 	tests := []struct {
@@ -38,7 +39,7 @@ func TestGenDiff(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			result, err := GenDiff(tt.file1Path, tt.file2Path, "stylish")
-			require.NoError(t, err, "GenDiff должна была успешно выполниться")
+			require.NoError(t, err, ERRMSG)
 			assert.Equal(t, tt.expected, result)
 		})
 	}
@@ -67,7 +68,7 @@ func TestGenDiffEqualFiles(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			result, err := GenDiff(tt.file1Path, tt.file2Path, "stylish")
-			require.NoError(t, err, "GenDiff должна была успешно выполниться")
+			require.NoError(t, err, ERRMSG)
 			assert.Equal(t, tt.expected, result)
 		})
 	}
@@ -110,7 +111,7 @@ func TestGenDiffIntegration(t *testing.T) {
 
 			result, err := GenDiff(file1Path, file2Path, "stylish")
 
-			require.NoError(t, err, "GenDiff должна была успешно выполниться")
+			require.NoError(t, err, ERRMSG)
 
 			assert.Equal(t, expected, result)
 			assert.NotEmpty(t, result)
@@ -174,7 +175,7 @@ func TestGenDiffIntegrationComplex(t *testing.T) {
 	// Генерация diff
 	result, err := GenDiff(file1Path, file2Path, "stylish")
 
-	require.NoError(t, err, "GenDiff должна была успешно выполниться")
+	require.NoError(t, err, ERRMSG)
 
 	// Проверка
 	assert.Equal(t, expected, result, "Сгенерированный Diff не соответствует ожидаемому.")
@@ -186,7 +187,7 @@ func TestGenDiffIntegrationComplex(t *testing.T) {
 	// Генерация diff
 	result, err = GenDiff(file1Path, file2Path, "stylish")
 
-	require.NoError(t, err, "GenDiff должна была успешно выполниться")
+	require.NoError(t, err, ERRMSG)
 
 	// Проверка
 	assert.Equal(t, expected, result, "Сгенерированный Diff не соответствует ожидаемому.")
