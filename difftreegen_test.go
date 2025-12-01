@@ -5,7 +5,13 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 )
+
+const JSON1 = "file1.json"
+const JSON2 = "file2.json"
+const YAML1 = "file1.yaml"
+const YAML2 = "file2.yaml"
 
 func TestGenDiff(t *testing.T) {
 	tests := []struct {
@@ -16,8 +22,8 @@ func TestGenDiff(t *testing.T) {
 	}{
 		{
 			name:      "main example",
-			file1Path: filepath.Join("testdata", "file1.json"),
-			file2Path: filepath.Join("testdata", "file2.json"),
+			file1Path: filepath.Join("testdata", JSON1),
+			file2Path: filepath.Join("testdata", JSON2),
 			expected: `{
   - follow: false
     host: hexlet.io
@@ -31,7 +37,8 @@ func TestGenDiff(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			result, _ := GenDiff(tt.file1Path, tt.file2Path, "stylish")
+			result, err := GenDiff(tt.file1Path, tt.file2Path, "stylish")
+			require.NoError(t, err, "GenDiff должна была успешно выполниться")
 			assert.Equal(t, tt.expected, result)
 		})
 	}
@@ -46,8 +53,8 @@ func TestGenDiffEqualFiles(t *testing.T) {
 	}{
 		{
 			name:      "main example",
-			file1Path: filepath.Join("testdata", "file1.json"),
-			file2Path: filepath.Join("testdata", "file1.json"),
+			file1Path: filepath.Join("testdata", JSON1),
+			file2Path: filepath.Join("testdata", JSON1),
 			expected: `{
     follow: false
     host: hexlet.io
@@ -59,7 +66,8 @@ func TestGenDiffEqualFiles(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			result, _ := GenDiff(tt.file1Path, tt.file2Path, "stylish")
+			result, err := GenDiff(tt.file1Path, tt.file2Path, "stylish")
+			require.NoError(t, err, "GenDiff должна была успешно выполниться")
 			assert.Equal(t, tt.expected, result)
 		})
 	}
@@ -84,13 +92,13 @@ func TestGenDiffIntegration(t *testing.T) {
 	}{
 		{
 			name:      "JSON files",
-			file1Name: "file1.json",
-			file2Name: "file2.json",
+			file1Name: JSON1,
+			file2Name: JSON2,
 		},
 		{
 			name:      "YAML files",
-			file1Name: "file1.yaml",
-			file2Name: "file2.yaml",
+			file1Name: YAML1,
+			file2Name: YAML2,
 		},
 	}
 
@@ -100,7 +108,9 @@ func TestGenDiffIntegration(t *testing.T) {
 			file1Path := filepath.Join("testdata", tt.file1Name)
 			file2Path := filepath.Join("testdata", tt.file2Name)
 
-			result, _ := GenDiff(file1Path, file2Path, "stylish")
+			result, err := GenDiff(file1Path, file2Path, "stylish")
+
+			require.NoError(t, err, "GenDiff должна была успешно выполниться")
 
 			assert.Equal(t, expected, result)
 			assert.NotEmpty(t, result)
@@ -158,21 +168,25 @@ func TestGenDiffIntegrationComplex(t *testing.T) {
 }`
 
 	// Пути к JSON файлам
-	file1Path := filepath.Join("testdata", "fixture", "file1.json")
-	file2Path := filepath.Join("testdata", "fixture", "file2.json")
+	file1Path := filepath.Join("testdata", "fixture", JSON1)
+	file2Path := filepath.Join("testdata", "fixture", JSON2)
 
 	// Генерация diff
-	result, _ := GenDiff(file1Path, file2Path, "stylish")
+	result, err := GenDiff(file1Path, file2Path, "stylish")
+
+	require.NoError(t, err, "GenDiff должна была успешно выполниться")
 
 	// Проверка
 	assert.Equal(t, expected, result, "Сгенерированный Diff не соответствует ожидаемому.")
 
 	// Пути к YAML файлам
-	file1Path = filepath.Join("testdata", "fixture", "file1.yaml")
-	file2Path = filepath.Join("testdata", "fixture", "file2.yaml")
+	file1Path = filepath.Join("testdata", "fixture", YAML1)
+	file2Path = filepath.Join("testdata", "fixture", YAML2)
 
 	// Генерация diff
-	result, _ = GenDiff(file1Path, file2Path, "stylish")
+	result, err = GenDiff(file1Path, file2Path, "stylish")
+
+	require.NoError(t, err, "GenDiff должна была успешно выполниться")
 
 	// Проверка
 	assert.Equal(t, expected, result, "Сгенерированный Diff не соответствует ожидаемому.")

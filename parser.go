@@ -38,11 +38,9 @@ func parseJSON(data []byte) (map[string]interface{}, error) {
 	if err := json.Unmarshal(data, &result); err != nil {
 		// Если это не объект, пробуем распарсить как массив
 		var arrayResult []interface{}
-		if arrayErr := json.Unmarshal(data, &arrayResult); arrayErr == nil {
-			// Успешно распарсили массив, оборачиваем его в map
-			return map[string]interface{}{
-				"_array": arrayResult,
-			}, nil
+		if json.Unmarshal(data, &arrayResult) == nil {
+			// Успешно распарсили массив, возвращаем пустую map
+			return make(map[string]interface{}), nil
 		}
 		// Если оба варианта не сработали, возвращаем оригинальную ошибку
 		return nil, fmt.Errorf("invalid JSON: %w", err)
@@ -56,11 +54,9 @@ func parseYAML(data []byte) (map[string]interface{}, error) {
 	if err := yaml.Unmarshal(data, &result); err != nil {
 		// Если это не объект, пробуем распарсить как массив
 		var arrayResult []interface{}
-		if arrayErr := yaml.Unmarshal(data, &arrayResult); arrayErr == nil {
-			// Успешно распарсили массив, оборачиваем его в map
-			return map[string]interface{}{
-				"_array": arrayResult,
-			}, nil
+		if yaml.Unmarshal(data, &arrayResult) == nil {
+			// Успешно распарсили массив, возвращаем пустую map
+			return make(map[string]interface{}), nil
 		}
 		// Если оба варианта не сработали, возвращаем оригинальную ошибку
 		return nil, fmt.Errorf("invalid YAML: %w", err)
