@@ -153,8 +153,13 @@ func formatPlainValue(v interface{}) string {
 func formatJSON(diff mapDiff) string {
 	log.Printf("[DEBUG] formatJSON: called with diff length=%d", len(diff))
 	
-	// 1. Кодируем mapDiff в JSON
-	data, err := json.MarshalIndent(diff, "", "  ")
+	// Оборачиваем mapDiff в объект для корректного JSON структуры
+	// Вместо массива [ ... ] возвращаем объект { "diff": [ ... ] }
+	result := map[string]interface{}{
+		"diff": diff,
+	}
+	
+	data, err := json.MarshalIndent(result, "", "  ")
 	if err != nil {
 		log.Printf("[DEBUG] formatJSON: error during marshal: %v", err)
 		return fmt.Sprintf("Error marshalling diff to JSON: %v", err)
