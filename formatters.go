@@ -3,11 +3,12 @@ package code
 import (
 	"encoding/json"
 	"fmt"
+	"log"
 	"strings"
 )
 
 // formatStylish форматирует дерево различий в стиле Stylish.
-func formatStylish(diff MapDiff) string {
+func formatStylish(diff mapDiff) string {
 	var builder strings.Builder
 	builder.WriteString("{\n")
 	formatStylishNodes(diff, &builder, 1)
@@ -17,7 +18,7 @@ func formatStylish(diff MapDiff) string {
 
 // formatStylishNodes рекурсивно обходит узлы и записывает отформатированную строку.
 // indentLevel - уровень вложенности для отступов (1 уровень = 4 пробела)
-func formatStylishNodes(diff MapDiff, builder *strings.Builder, indentLevel int) {
+func formatStylishNodes(diff mapDiff, builder *strings.Builder, indentLevel int) {
 	const indentSize = 4
 
 	// Базовый отступ: (4 * уровень) - 2 пробела (для символов "+", "-", " ")
@@ -25,20 +26,20 @@ func formatStylishNodes(diff MapDiff, builder *strings.Builder, indentLevel int)
 
 	for _, node := range diff {
 		switch node.Type {
-		case Unchanged:
+		case unchanged:
 			// Отступ + "  " + ключ: значение
 			fmt.Fprintf(builder, "%s  %s: %v\n", baseIndent, node.Key, formatStylishValue(node.Value1, indentLevel))
-		case Added:
+		case added:
 			// Отступ + "+ " + ключ: значение
 			fmt.Fprintf(builder, "%s+ %s: %v\n", baseIndent, node.Key, formatStylishValue(node.Value2, indentLevel))
-		case Removed:
+		case removed:
 			// Отступ + "- " + ключ: значение
 			fmt.Fprintf(builder, "%s- %s: %v\n", baseIndent, node.Key, formatStylishValue(node.Value1, indentLevel))
-		case Changed:
+		case changed:
 			// Сначала Removed, потом Added
 			fmt.Fprintf(builder, "%s- %s: %v\n", baseIndent, node.Key, formatStylishValue(node.Value1, indentLevel))
 			fmt.Fprintf(builder, "%s+ %s: %v\n", baseIndent, node.Key, formatStylishValue(node.Value2, indentLevel))
-		case Nested:
+		case nested:
 			// Вложенная структура: открываем новую секцию
 			fmt.Fprintf(builder, "%s  %s: {\n", baseIndent, node.Key)
 			// Рекурсивный вызов для дочерних узлов
@@ -84,7 +85,7 @@ func formatStylishValue(v interface{}, indentLevel int) string {
 }
 
 // formatPlain форматирует дерево различий в плоском формате.
-func formatPlain(diff MapDiff) string {
+func formatPlain(diff mapDiff) string {
 	var builder strings.Builder
 	// Рекурсивный обход, начиная с пустого пути
 	formatPlainNodes(diff, "", &builder)
@@ -98,7 +99,7 @@ func formatPlain(diff MapDiff) string {
 }
 
 // formatPlainNodes рекурсивно обходит дерево и строит вывод в плоском формате.
-func formatPlainNodes(diff MapDiff, path string, builder *strings.Builder) {
+func formatPlainNodes(diff mapDiff, path string, builder *strings.Builder) {
 	for _, node := range diff {
 		currentPath := node.Key
 		if path != "" {
@@ -106,24 +107,24 @@ func formatPlainNodes(diff MapDiff, path string, builder *strings.Builder) {
 		}
 
 		switch node.Type {
-		case Added:
+		case added:
 			formattedValue := formatPlainValue(node.Value2)
 			fmt.Fprintf(builder, "Property '%s' was added with value: %s\n", currentPath, formattedValue)
 
-		case Removed:
+		case removed:
 			fmt.Fprintf(builder, "Property '%s' was removed\n", currentPath)
 
-		case Changed:
+		case changed:
 			oldVal := formatPlainValue(node.Value1)
 			newVal := formatPlainValue(node.Value2)
 			fmt.Fprintf(builder, "Property '%s' was updated. From %s to %s\n", currentPath, oldVal, newVal)
 
-		case Nested:
+		case nested:
 			// Рекурсивный вызов для вложенных узлов, передавая текущий путь
 			formatPlainNodes(node.Children, currentPath, builder)
 
 		// Unchanged узлы игнорируются в плоском формате
-		case Unchanged:
+		case unchanged:
 			continue
 		}
 	}
@@ -149,13 +150,24 @@ func formatPlainValue(v interface{}) string {
 }
 
 // formatJSON форматирует дерево различий в JSON формате.
-func formatJSON(diff MapDiff) string {
-	// 1. Кодируем MapDiff в JSON
+func formatJSON(diff mapDiff) string {
+	log.Printf("[DEBUG] formatJSON: called with diff length=%d", len(diff))
+	
+	// 1. Кодируем mapDiff в JSON
 	data, err := json.MarshalIndent(diff, "", "  ")
 	if err != nil {
+		log.Printf("[DEBUG] formatJSON: error during marshal: %v", err)
 		return fmt.Sprintf("Error marshalling diff to JSON: %v", err)
 	}
 
+	log.Printf("[DEBUG] formatJSON: successfully marshalled, result length=%d bytes", len(data))
+	log.Printf("[DEBUG] formatJSON: first 100 chars: %s", string(data[:min(100, len(data))]))
 	return string(data)
 }
 
+func min(a, b int) int {
+	if a < b {
+		return a
+	}
+	return b
+}

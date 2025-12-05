@@ -5,29 +5,29 @@ import (
 	"sort"
 )
 
-// DiffNodeType определяет тип изменения узла
-type DiffNodeType string
+// diffNodeType определяет тип изменения узла
+type diffNodeType string
 
 const (
 	// Типы узлов:
-	Added     DiffNodeType = "added"     // Узел есть только во втором файле
-	Removed   DiffNodeType = "removed"   // Узел есть только в первом файле
-	Unchanged DiffNodeType = "unchanged" // Узел есть в обоих файлах и значения равны
-	Changed   DiffNodeType = "changed"   // Узел есть в обоих файлах, но значения отличаются
-	Nested    DiffNodeType = "nested"    // Узел является вложенным объектом (map)
+	added     diffNodeType = "added"     // Узел есть только во втором файле
+	removed   diffNodeType = "removed"   // Узел есть только в первом файле
+	unchanged diffNodeType = "unchanged" // Узел есть в обоих файлах и значения равны
+	changed   diffNodeType = "changed"   // Узел есть в обоих файлах, но значения отличаются
+	nested    diffNodeType = "nested"    // Узел является вложенным объектом (map)
 )
 
-// DiffNode представляет один узел в дереве различий
-type DiffNode struct {
+// diffNode представляет один узел в дереве различий
+type diffNode struct {
 	Key      string
-	Type     DiffNodeType
+	Type     diffNodeType
 	Value1   interface{} // Значение из первого файла (используется для Removed, Unchanged, Changed)
 	Value2   interface{} // Значение из второго файла (используется для Added, Changed)
-	Children []DiffNode  // Используется только для Nested
+	Children []diffNode  // Используется только для Nested
 }
 
-// MapDiff — это итоговое дерево различий (корневой уровень)
-type MapDiff []DiffNode
+// mapDiff — это итоговое дерево различий (корневой уровень)
+type mapDiff []diffNode
 
 // findUniqueSortedKeys собирает все уникальные ключи из двух карт и сортирует их.
 func findUniqueSortedKeys(data1, data2 map[string]interface{}) []string {
@@ -63,5 +63,3 @@ func isMap(v interface{}) (map[string]interface{}, bool) {
 func deepEqual(val1, val2 interface{}) bool {
 	return reflect.DeepEqual(val1, val2)
 }
-
-

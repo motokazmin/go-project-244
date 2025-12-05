@@ -309,4 +309,3 @@ func TestJSONFormatter(t *testing.T) {
 
 	assert.Equal(t, strings.TrimSpace(expected), strings.TrimSpace(actual), "Сгенерированный JSON Diff не соответствует ожидаемому.")
 }
-
