@@ -7,7 +7,7 @@ import (
 )
 
 // formatStylish форматирует дерево различий в стиле Stylish.
-func formatStylish(diff mapDiff) string {
+func formatStylish(diff MapDiff) string {
 	var builder strings.Builder
 	builder.WriteString("{\n")
 	formatStylishNodes(diff, &builder, 1)
@@ -17,7 +17,7 @@ func formatStylish(diff mapDiff) string {
 
 // formatStylishNodes рекурсивно обходит узлы и записывает отформатированную строку.
 // indentLevel - уровень вложенности для отступов (1 уровень = 4 пробела)
-func formatStylishNodes(diff mapDiff, builder *strings.Builder, indentLevel int) {
+func formatStylishNodes(diff MapDiff, builder *strings.Builder, indentLevel int) {
 	const indentSize = 4
 
 	// Базовый отступ: (4 * уровень) - 2 пробела (для символов "+", "-", " ")
@@ -25,20 +25,20 @@ func formatStylishNodes(diff mapDiff, builder *strings.Builder, indentLevel int)
 
 	for _, node := range diff {
 		switch node.Type {
-		case unchanged:
+		case Unchanged:
 			// Отступ + "  " + ключ: значение
 			fmt.Fprintf(builder, "%s  %s: %v\n", baseIndent, node.Key, formatStylishValue(node.Value1, indentLevel))
-		case added:
+		case Added:
 			// Отступ + "+ " + ключ: значение
 			fmt.Fprintf(builder, "%s+ %s: %v\n", baseIndent, node.Key, formatStylishValue(node.Value2, indentLevel))
-		case removed:
+		case Removed:
 			// Отступ + "- " + ключ: значение
 			fmt.Fprintf(builder, "%s- %s: %v\n", baseIndent, node.Key, formatStylishValue(node.Value1, indentLevel))
-		case changed:
+		case Changed:
 			// Сначала Removed, потом Added
 			fmt.Fprintf(builder, "%s- %s: %v\n", baseIndent, node.Key, formatStylishValue(node.Value1, indentLevel))
 			fmt.Fprintf(builder, "%s+ %s: %v\n", baseIndent, node.Key, formatStylishValue(node.Value2, indentLevel))
-		case nested:
+		case Nested:
 			// Вложенная структура: открываем новую секцию
 			fmt.Fprintf(builder, "%s  %s: {\n", baseIndent, node.Key)
 			// Рекурсивный вызов для дочерних узлов
@@ -84,7 +84,7 @@ func formatStylishValue(v interface{}, indentLevel int) string {
 }
 
 // formatPlain форматирует дерево различий в плоском формате.
-func formatPlain(diff mapDiff) string {
+func formatPlain(diff MapDiff) string {
 	var builder strings.Builder
 	// Рекурсивный обход, начиная с пустого пути
 	formatPlainNodes(diff, "", &builder)
@@ -98,7 +98,7 @@ func formatPlain(diff mapDiff) string {
 }
 
 // formatPlainNodes рекурсивно обходит дерево и строит вывод в плоском формате.
-func formatPlainNodes(diff mapDiff, path string, builder *strings.Builder) {
+func formatPlainNodes(diff MapDiff, path string, builder *strings.Builder) {
 	for _, node := range diff {
 		currentPath := node.Key
 		if path != "" {
@@ -106,24 +106,24 @@ func formatPlainNodes(diff mapDiff, path string, builder *strings.Builder) {
 		}
 
 		switch node.Type {
-		case added:
+		case Added:
 			formattedValue := formatPlainValue(node.Value2)
 			fmt.Fprintf(builder, "Property '%s' was added with value: %s\n", currentPath, formattedValue)
 
-		case removed:
+		case Removed:
 			fmt.Fprintf(builder, "Property '%s' was removed\n", currentPath)
 
-		case changed:
+		case Changed:
 			oldVal := formatPlainValue(node.Value1)
 			newVal := formatPlainValue(node.Value2)
 			fmt.Fprintf(builder, "Property '%s' was updated. From %s to %s\n", currentPath, oldVal, newVal)
 
-		case nested:
+		case Nested:
 			// Рекурсивный вызов для вложенных узлов, передавая текущий путь
 			formatPlainNodes(node.Children, currentPath, builder)
 
 		// Unchanged узлы игнорируются в плоском формате
-		case unchanged:
+		case Unchanged:
 			continue
 		}
 	}
@@ -149,8 +149,8 @@ func formatPlainValue(v interface{}) string {
 }
 
 // formatJSON форматирует дерево различий в JSON формате.
-func formatJSON(diff mapDiff) string {
-	// 1. Кодируем mapDiff в JSON
+func formatJSON(diff MapDiff) string {
+	// 1. Кодируем MapDiff в JSON
 	data, err := json.MarshalIndent(diff, "", "  ")
 	if err != nil {
 		return fmt.Sprintf("Error marshalling diff to JSON: %v", err)
