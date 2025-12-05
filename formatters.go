@@ -3,7 +3,6 @@ package code
 import (
 	"encoding/json"
 	"fmt"
-	"log"
 	"strings"
 )
 
@@ -151,8 +150,6 @@ func formatPlainValue(v interface{}) string {
 
 // formatJSON форматирует дерево различий в JSON формате.
 func formatJSON(diff mapDiff) string {
-	log.Printf("[DEBUG] formatJSON: called with diff length=%d", len(diff))
-	
 	// Оборачиваем mapDiff в объект для корректного JSON структуры
 	// Вместо массива [ ... ] возвращаем объект { "diff": [ ... ] }
 	result := map[string]interface{}{
@@ -161,18 +158,8 @@ func formatJSON(diff mapDiff) string {
 	
 	data, err := json.MarshalIndent(result, "", "  ")
 	if err != nil {
-		log.Printf("[DEBUG] formatJSON: error during marshal: %v", err)
 		return fmt.Sprintf("Error marshalling diff to JSON: %v", err)
 	}
 
-	log.Printf("[DEBUG] formatJSON: successfully marshalled, result length=%d bytes", len(data))
-	log.Printf("[DEBUG] formatJSON: first 100 chars: %s", string(data[:min(100, len(data))]))
 	return string(data)
-}
-
-func min(a, b int) int {
-	if a < b {
-		return a
-	}
-	return b
 }

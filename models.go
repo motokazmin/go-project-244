@@ -32,15 +32,11 @@ type mapDiff []diffNode
 // findUniqueSortedKeys собирает все уникальные ключи из двух карт и сортирует их.
 func findUniqueSortedKeys(data1, data2 map[string]interface{}) []string {
 	keys := make(map[string]bool)
-	if data1 != nil {
-		for k := range data1 {
-			keys[k] = true
-		}
+	for k := range data1 {
+		keys[k] = true
 	}
-	if data2 != nil {
-		for k := range data2 {
-			keys[k] = true
-		}
+	for k := range data2 {
+		keys[k] = true
 	}
 
 	sortedKeys := make([]string, 0, len(keys))
