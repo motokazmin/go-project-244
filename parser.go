@@ -43,6 +43,12 @@ func parseJSON(data []byte) (map[string]interface{}, error) {
 		// Если оба варианта не сработали, возвращаем оригинальную ошибку
 		return nil, fmt.Errorf("invalid JSON: %w", err)
 	}
+
+	// Проверяем, что result не nil (был JSON null)
+	if result == nil {
+		return nil, fmt.Errorf("invalid JSON: null is not allowed")
+	}
+
 	return result, nil
 }
 
@@ -59,6 +65,12 @@ func parseYAML(data []byte) (map[string]interface{}, error) {
 		// Если оба варианта не сработали, возвращаем оригинальную ошибку
 		return nil, fmt.Errorf("invalid YAML: %w", err)
 	}
+
+	// Проверяем, что result не nil (был YAML null)
+	if result == nil {
+		return nil, fmt.Errorf("invalid YAML: null is not allowed")
+	}
+
 	return result, nil
 }
 
