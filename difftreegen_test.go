@@ -179,7 +179,7 @@ func TestGenDiffIntegrationComplex(t *testing.T) {
 	require.NoError(t, err, ERRMSG)
 
 	// Проверка
-	assert.Equal(t, expected, result, "Сгенерированный Diff не соответствует ожидаемому")
+	assert.Equal(t, expected, result, "Сгенерированный Diff не соответствует ожидаемому.")
 
 	// Пути к YAML файлам
 	file1Path = filepath.Join("testdata", "fixture", YAML1)
