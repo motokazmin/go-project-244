@@ -36,6 +36,7 @@ func buildDiff(data1, data2 map[string]interface{}) mapDiff {
 				// 3c. Значения изменились
 				node.Type = changed
 				node.Value1 = val1
+
 				node.Value2 = val2
 			}
 		}
