@@ -57,8 +57,6 @@ func main() {
 		},
 	}
 
-	var k int = 13
-
 	if err := command.Run(context.Background(), os.Args); err != nil {
 		log.Fatal(err)
 	}
